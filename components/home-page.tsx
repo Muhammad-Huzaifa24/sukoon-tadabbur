@@ -16,10 +16,12 @@ import {
 } from 'lucide-react'
 
 const navItems = [
-  { label: 'Reminders', href: '#reminders' },
-  { label: 'Learn', href: '#learn' },
-  { label: 'Gather', href: '#gather' },
-  { label: 'Journal', href: '#journal' },
+  { label: 'Home', href: '#top' },
+  { label: 'Reminders', href: '/reminders' },
+  { label: 'Series', href: '/series' },
+  { label: 'Courses', href: '/courses' },
+  { label: 'Tadabbur', href: '/tadabbur' },
+  { label: 'Consultation', href: '/consultation' },
 ]
 
 const notes = [

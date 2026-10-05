@@ -1,0 +1,62 @@
+'use client'
+
+import { useState } from 'react'
+import { ArrowUpRight, CalendarDays, Check, Clock3, LockKeyhole, Menu, Play, Sparkles, X } from 'lucide-react'
+
+const navigation = [
+  { label: 'Home', href: '/' },
+  { label: 'Reminders', href: '/reminders' },
+  { label: 'Series', href: '/series' },
+  { label: 'Courses', href: '/courses' },
+  { label: 'Tadabbur', href: '/tadabbur' },
+  { label: 'Consultation', href: '/consultation' },
+  { label: 'Blog', href: '/blog' },
+]
+
+const series = [
+  ['The art of beginning again', 'Six gentle prompts for returning to what matters.', '8 parts', 'Free'],
+  ['A slower kind of courage', 'Notes for moving through change without abandoning yourself.', '5 parts', 'Free'],
+  ['The room between things', 'A private letter series about attention and transition.', '6 parts', 'Premium'],
+]
+
+const courses = [
+  ['Listening to your inner weather', 'Notice the patterns beneath the noise.', '4 lessons', '$24', 'Premium'],
+  ['The spacious life', 'Attention, boundaries, and living with intention.', '2 sessions', '$38', 'Masterclass'],
+  ['Returning to presence', 'A small, practical course for full days.', '3 lessons', 'Free', 'Micro course'],
+]
+
+function Header() {
+  const [open, setOpen] = useState(false)
+  return <header className="mx-auto flex max-w-7xl items-center justify-between px-6 py-6 lg:px-10">
+    <a href="/" className="font-serif text-2xl tracking-tight">sukoon<span className="text-terracotta">.</span></a>
+    <nav className="hidden items-center gap-6 lg:flex" aria-label="Primary navigation">{navigation.map((item) => <a key={item.href} href={item.href} className="text-sm text-muted-foreground transition-colors hover:text-foreground">{item.label}</a>)}</nav>
+    <a href="/reminders" className="hidden rounded-full bg-ink px-5 py-2.5 text-sm text-white lg:inline-flex">Explore <ArrowUpRight className="ml-1 size-4" /></a>
+    <button className="rounded-full border border-border p-2 lg:hidden" onClick={() => setOpen(!open)} aria-label={open ? 'Close menu' : 'Open menu'}>{open ? <X className="size-5" /> : <Menu className="size-5" />}</button>
+    {open && <nav className="absolute left-6 right-6 top-20 z-10 flex flex-col gap-4 rounded-2xl border border-border bg-paper p-5 shadow-lg lg:hidden" aria-label="Mobile navigation">{navigation.map((item) => <a key={item.href} href={item.href} onClick={() => setOpen(false)} className="text-sm">{item.label}</a>)}</nav>}
+  </header>
+}
+
+function PageIntro({ eyebrow, title, description }: { eyebrow: string; title: string; description: string }) {
+  return <section className="mx-auto max-w-7xl px-6 pb-16 pt-12 lg:px-10 lg:pb-24 lg:pt-20"><p className="eyebrow">{eyebrow}</p><h1 className="section-title mt-4 max-w-3xl">{title}</h1><p className="mt-6 max-w-xl text-lg leading-8 text-muted-foreground">{description}</p></section>
+}
+
+function CardGrid({ items, kind }: { items: string[][]; kind: 'series' | 'courses' }) {
+  return <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">{items.map((item, index) => <article key={item[0]} className={`flex min-h-[300px] flex-col rounded-[1.75rem] border border-border p-7 ${index === 1 ? 'bg-olive text-paper' : 'bg-card'}`}><div className="flex items-center justify-between"><span className={`rounded-full px-3 py-1 text-xs ${index === 1 ? 'bg-paper/15 text-paper' : 'bg-olive/12 text-olive'}`}>{kind === 'series' ? item[3] : item[4]}</span>{kind === 'series' ? <span className="text-xs opacity-60">{item[2]}</span> : <Clock3 className="size-5 opacity-70" />}</div><h2 className="mt-auto font-serif text-3xl leading-tight">{item[0]}</h2><p className={`mt-4 text-sm leading-6 ${index === 1 ? 'text-paper/65' : 'text-muted-foreground'}`}>{item[1]}</p><div className={`mt-6 flex items-center justify-between border-t pt-4 text-sm ${index === 1 ? 'border-paper/20' : 'border-border'}`}><span>{kind === 'series' ? 'Start exploring' : `${item[2]} · ${item[3]}`}</span><ArrowUpRight className="size-4" /></div></article>)}</div>
+}
+
+function Footer() { return <footer className="mt-20 border-t border-border"><div className="mx-auto flex max-w-7xl flex-col gap-5 px-6 py-8 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between lg:px-10"><a href="/" className="font-serif text-xl text-ink">sukoon<span className="text-terracotta">.</span></a><p>For the life you are already living.</p><div className="flex flex-wrap gap-5"><a href="/blog">Blog</a><a href="mailto:hello@sukoon.example">Contact</a><a href="/">Privacy</a></div></div></footer> }
+
+export function ContentPage({ type }: { type: 'reminders' | 'series' | 'courses' | 'tadabbur' | 'consultation' | 'blog' }) {
+  return <main><Header />
+    {type === 'reminders' && <><PageIntro eyebrow="The daily practice" title={<>Small words for <em>the long way.</em></>} description="A quiet library of reminders, plus private letters for the seasons that ask a little more of us." /><section className="mx-auto max-w-7xl px-6 lg:px-10"><div className="grid gap-5 lg:grid-cols-[1.2fr_0.8fr]"><article className="flex min-h-[390px] flex-col justify-between rounded-[2rem] bg-ink p-8 text-paper lg:p-10"><p className="eyebrow text-paper/60">Free daily reminder · 06.10.26</p><p className="max-w-2xl font-serif text-4xl leading-tight md:text-6xl">“You are allowed to take the long way to a life that feels like your own.”</p><div className="flex items-center gap-4"><button className="rounded-full bg-paper px-4 py-2.5 text-sm text-ink"><Play className="mr-1 inline size-4 fill-current" /> Listen · 2 min</button><span className="text-sm text-paper/50">A note by Amina Rahman</span></div></article><div className="rounded-[2rem] border border-terracotta/25 bg-sand/60 p-8"><LockKeyhole className="size-6 text-terracotta" /><p className="eyebrow mt-16">Letters & reminders</p><h2 className="mt-3 font-serif text-4xl">For what the daily note cannot hold.</h2><p className="mt-5 leading-7 text-muted-foreground">Longer, more intimate letters for paying attention to the hidden parts of a season.</p><a href="/consultation" className="mt-8 inline-flex rounded-full bg-ink px-5 py-3 text-sm text-white">Explore letters <ArrowUpRight className="ml-1 size-4" /></a></div></div></section></>}
+    {type === 'series' && <><PageIntro eyebrow="Move at your own pace" title={<>Short series, <em>lasting questions.</em></>} description="A few free, thoughtful paths to return to whenever you need a little direction." /><section className="mx-auto max-w-7xl px-6 lg:px-10"><CardGrid items={series} kind="series" /></section></>}
+    {type === 'courses' && <><PageIntro eyebrow="Learn & reflect" title={<>Learning that <em>stays with you.</em></>} description="Small courses and masterclasses for the curious mind. No rush, no noise." /><section className="mx-auto max-w-7xl px-6 lg:px-10"><CardGrid items={courses} kind="courses" /></section></>}
+    {type === 'tadabbur' && <><PageIntro eyebrow="Gather in good company" title={<>A deeper look at <em>what is here.</em></>} description="Live highlights and considered masterclasses for reflection, meaning, and the practice of noticing." /><section className="mx-auto max-w-7xl px-6 lg:px-10"><div className="grid gap-5 md:grid-cols-2"><article className="rounded-[1.75rem] bg-olive p-8 text-paper"><CalendarDays className="size-6 text-terracotta" /><p className="eyebrow mt-20 text-paper/60">Live · October 14</p><h2 className="mt-3 font-serif text-4xl">Tadabbur Highlights</h2><p className="mt-4 leading-7 text-paper/65">A live reflection on finding steadiness in uncertain seasons, hosted through Zoom or Google Meet.</p><button className="mt-8 rounded-full border border-paper/30 px-5 py-3 text-sm">Reserve a seat</button></article><article className="rounded-[1.75rem] bg-sand p-8 text-ink"><Sparkles className="size-6 text-terracotta" /><p className="eyebrow mt-20">Premium · October 28</p><h2 className="mt-3 font-serif text-4xl">The spacious life</h2><p className="mt-4 leading-7 text-ink/65">A two-part masterclass on attention, boundaries, and living with intention.</p><button className="mt-8 rounded-full bg-ink px-5 py-3 text-sm text-white">View masterclass</button></article></div></section></>}
+    {type === 'consultation' && <><PageIntro eyebrow="A private room" title={<>A conversation for <em>where you are.</em></>} description="One-on-one time to slow down, name what matters, and leave with a little more clarity." /><section className="mx-auto grid max-w-7xl gap-5 px-6 lg:grid-cols-[1fr_0.8fr] lg:px-10"><article className="rounded-[2rem] bg-sand p-8 lg:p-10"><p className="eyebrow">What we can explore</p><ul className="mt-8 flex flex-col gap-5">{['A season of transition or uncertainty', 'Finding a gentler relationship with your attention', 'Making space for a decision that matters'].map((item) => <li key={item} className="flex gap-3 leading-7"><Check className="mt-1 size-5 shrink-0 text-olive" />{item}</li>)}</ul></article><article className="rounded-[2rem] bg-ink p-8 text-paper lg:p-10"><p className="eyebrow text-paper/60">Private session</p><h2 className="mt-5 font-serif text-4xl">60 minutes</h2><p className="mt-4 text-paper/65">Online · Availability shared after your note</p><p className="mt-10 font-serif text-3xl">$75 <span className="font-sans text-sm text-paper/50">placeholder</span></p><a href="mailto:hello@sukoon.example?subject=Consultation" className="mt-8 inline-flex rounded-full bg-paper px-5 py-3 text-sm text-ink">Book a consultation <ArrowUpRight className="ml-1 size-4" /></a></article></section></>}
+    {type === 'blog' && <><PageIntro eyebrow="The journal" title={<>Notes for a life <em>already in motion.</em></>} description="Occasional writing on attention, faith, learning, and the quiet work of becoming." /><section className="mx-auto max-w-7xl px-6 lg:px-10"><article className="grid gap-8 rounded-[2rem] bg-sand p-8 md:grid-cols-2 md:p-12"><div><p className="eyebrow">Featured · 8 min read</p><h2 className="mt-5 font-serif text-4xl md:text-5xl">The work of returning</h2><p className="mt-5 leading-7 text-muted-foreground">You do not have to begin again from the beginning. You can begin again from where you are.</p><a href="/blog/the-work-of-returning" className="mt-8 inline-flex text-sm font-medium">Read the article <ArrowUpRight className="ml-1 size-4" /></a></div><div className="flex items-end justify-end"><span className="font-serif text-8xl text-terracotta/50">01</span></div></article><div className="mt-8 grid gap-5 md:grid-cols-2"><article className="rounded-[1.5rem] border border-border p-7"><p className="eyebrow">Reflection · 5 min</p><h2 className="mt-4 font-serif text-3xl">A little more room</h2><a href="/blog/the-work-of-returning" className="mt-6 inline-flex text-sm">Read note <ArrowUpRight className="ml-1 size-4" /></a></article><article className="rounded-[1.5rem] border border-border p-7"><p className="eyebrow">Practice · 4 min</p><h2 className="mt-4 font-serif text-3xl">On paying attention</h2><a href="/blog/the-work-of-returning" className="mt-6 inline-flex text-sm">Read note <ArrowUpRight className="ml-1 size-4" /></a></article></div></section></>}
+    <Footer /></main>
+}
+
+export function ArticlePage() { return <main><Header /><article className="mx-auto max-w-3xl px-6 pb-24 pt-16 lg:pt-24"><p className="eyebrow">Reflection · 8 min read</p><h1 className="section-title mt-5">The work of <em>returning.</em></h1><p className="mt-7 text-lg leading-8 text-muted-foreground">You do not have to begin again from the beginning. You can begin again from where you are.</p><div className="my-14 border-y border-border py-8 text-sm text-muted-foreground">A letter from Amina Rahman · October 6, 2026</div><div className="flex flex-col gap-7 font-serif text-2xl leading-[1.55] text-ink"><p>There are seasons when progress feels like a straight line, and seasons when it feels more like a tide. In the latter, returning is not failure. It is a form of wisdom.</p><p>Return to the breath. Return to the question. Return to the small promise you made before the noise got loud.</p><p>The place you are standing is not a detour from your life. It is part of the path, asking to be met with the same tenderness you would offer anyone else.</p></div><a href="/blog" className="mt-14 inline-flex text-sm font-medium">Back to the journal <ArrowUpRight className="ml-1 size-4" /></a></article><Footer /></main> }
+
+export function HomeRouteLink() { return null }
