@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 import { ArrowUpRight, CalendarDays, Check, Clock3, LockKeyhole, Menu, Play, Sparkles, X } from 'lucide-react'
 import { SubscribeForm } from '@/components/subscribe-form'
 import { createClient } from '@/lib/supabase/client'
@@ -28,7 +28,7 @@ function Header() {
   </header>
 }
 
-function PageIntro({ eyebrow, title, description }: { eyebrow: string; title: string; description: string }) {
+function PageIntro({ eyebrow, title, description }: { eyebrow: string; title: ReactNode; description: string }) {
   return <section className="mx-auto max-w-7xl px-6 pb-16 pt-12 lg:px-10 lg:pb-24 lg:pt-20"><p className="eyebrow">{eyebrow}</p><h1 className="section-title mt-4 max-w-3xl">{title}</h1><p className="mt-6 max-w-xl text-lg leading-8 text-muted-foreground">{description}</p></section>
 }
 

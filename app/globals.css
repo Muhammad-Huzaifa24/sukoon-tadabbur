@@ -57,6 +57,20 @@ body { @apply bg-background text-foreground; font-family: var(--font-geist), san
 .eyebrow { @apply text-xs font-semibold uppercase tracking-[0.22em] text-olive; }
 .section-title { @apply font-serif text-5xl leading-[0.98] tracking-[-0.04em] text-ink md:text-6xl; }
 .section-title em, h1 em { font-style: italic; font-weight: 400; }
+.editor-content:empty::before { content: attr(data-placeholder); color: var(--muted-foreground); pointer-events: none; }
+.editor-content ul { list-style: disc; padding-left: 1.5rem; }
+.editor-content ol { list-style: decimal; padding-left: 1.5rem; }
+.editor-content li { padding-left: 0.25rem; }
+.editor-content blockquote { border-left: 3px solid var(--terracotta); color: var(--muted-foreground); font-family: var(--font-display), Georgia, serif; font-style: italic; margin: 1rem 0; padding-left: 1rem; }
+.editor-content h1, .editor-content h2, .editor-content h3, .editor-content h4, .editor-content h5, .editor-content h6 { font-family: var(--font-display), Georgia, serif; font-weight: 600; line-height: 1.15; margin: 0.75rem 0; }
+.editor-content h1 { font-size: 2rem; }
+.editor-content h2 { font-size: 1.6rem; }
+.editor-content h3 { font-size: 1.35rem; }
+.editor-content h4 { font-size: 1.15rem; }
+.editor-content h5 { font-size: 1rem; }
+.editor-content h6 { font-size: 0.9rem; }
+
+@media (prefers-reduced-motion: reduce) {
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
