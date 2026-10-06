@@ -1,6 +1,11 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
+import { Amiri, Fraunces, Inter } from 'next/font/google'
 import './globals.css'
+
+const fraunces = Fraunces({ subsets: ['latin'], variable: '--font-fraunces', display: 'swap' })
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' })
+const amiri = Amiri({ subsets: ['arabic'], variable: '--font-amiri', weight: ['400', '700'], display: 'swap' })
 
 export const metadata: Metadata = {
   title: 'sukoon — Small words. Deep roots.',
@@ -17,7 +22,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className="antialiased">{children}{process.env.NODE_ENV === 'production' && <Analytics />}</body>
+      <body className={`${fraunces.variable} ${inter.variable} ${amiri.variable} antialiased`}>{children}{process.env.NODE_ENV === 'production' && <Analytics />}</body>
     </html>
   )
 }

@@ -23,8 +23,8 @@ a, button, select, [role='button'] { cursor: pointer; }
   --color-ink: var(--ink);
   --color-olive: var(--olive);
   --color-terracotta: var(--terracotta);
-  --font-sans: var(--font-geist);
-  --font-serif: var(--font-display);
+  --font-sans: var(--font-inter);
+  --font-serif: var(--font-fraunces);
 }
 
 :root {
@@ -45,15 +45,21 @@ a, button, select, [role='button'] { cursor: pointer; }
   --border: oklch(0.24 0.025 75 / 14%);
   --input: oklch(0.24 0.025 75 / 18%);
   --ring: oklch(0.58 0.12 42);
-  --font-display: Georgia, 'Times New Roman', serif;
-  --font-geist: Arial, Helvetica, sans-serif;
+  --font-display: var(--font-fraunces), Georgia, 'Times New Roman', serif;
+  --font-geist: var(--font-inter), Arial, Helvetica, sans-serif;
   --radius: 1rem;
 }
 
 * { @apply border-border; }
 html { scroll-behavior: smooth; }
 body { @apply bg-background text-foreground; font-family: var(--font-geist), sans-serif; }
-.font-serif { font-family: var(--font-display), Georgia, serif; }
+.font-serif, .font-display { font-family: var(--font-display), Georgia, serif; }
+.arabic { direction: rtl; font-family: var(--font-amiri), serif; font-size: 1.25em; line-height: 2; }
+
+body { background-image: radial-gradient(circle at 15% 10%, oklch(0.58 0.12 42 / 4%), transparent 22rem), radial-gradient(circle at 90% 35%, oklch(0.38 0.07 125 / 4%), transparent 26rem); }
+
+button, a { min-height: 2.75rem; }
+button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; }
 .eyebrow { @apply text-xs font-semibold uppercase tracking-[0.22em] text-olive; }
 .section-title { @apply font-serif text-5xl leading-[0.98] tracking-[-0.04em] text-ink md:text-6xl; }
 .section-title em, h1 em { font-style: italic; font-weight: 400; }
