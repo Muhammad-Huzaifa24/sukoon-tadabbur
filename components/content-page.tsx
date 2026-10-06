@@ -1,10 +1,8 @@
-'use client'
-
-import { ReactNode, useEffect, useState } from 'react'
+import { ReactNode } from 'react'
 import { ArrowUpRight, CalendarDays, Check, Clock3, LockKeyhole, Menu, Play, Sparkles, X } from 'lucide-react'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/supabase/server'
 
 const navigation = [
   { label: 'Home', href: '/' },
@@ -30,12 +28,10 @@ function CardGrid({ items, kind }: { items: ContentItem[]; kind: 'series' | 'cou
 
 function Footer() { return <SiteFooter /> }
 
-export function ContentPage({ type }: { type: 'reminders' | 'series' | 'courses' | 'tadabbur' | 'consultation' | 'blog' }) {
-  const [items, setItems] = useState<ContentItem[]>([])
-  useEffect(() => {
-    createClient().from('site_content').select('id,title,excerpt,body,category,slug').eq('status', 'published').then(({ data }) => setItems(data ?? []))
-  }, [])
-  const categoryItems = items.filter((item) => item.category.toLowerCase() === (type === 'courses' ? 'course' : type))
+export async function ContentPage({ type }: { type: 'reminders' | 'series' | 'courses' | 'tadabbur' | 'consultation' | 'blog' }) {
+  const client = await createClient()
+  const { data } = await client.from('published_content').select('id,title,excerpt,body,category,slug').eq('type', type === 'courses' ? 'course' : type).order('position', { ascending: true })
+  const categoryItems = (data ?? []) as ContentItem[]
   return <main><Header />
     {type === 'reminders' && <><PageIntro eyebrow="The daily practice" title={<>Small words for <em>the long way.</em></>} description="A quiet library of reminders, plus private letters for the seasons that ask a little more of us." /><section className="mx-auto max-w-7xl px-6 lg:px-10"><div className="grid gap-5 lg:grid-cols-[1.2fr_0.8fr]"><article className="flex min-h-[390px] flex-col justify-between rounded-[2rem] bg-ink p-8 text-paper lg:p-10"><p className="eyebrow text-paper/60">Free daily reminder · 06.10.26</p><p className="max-w-2xl font-serif text-4xl leading-tight md:text-6xl">“You are allowed to take the long way to a life that feels like your own.”</p><div className="flex items-center gap-4"><button className="rounded-full bg-paper px-4 py-2.5 text-sm text-ink"><Play className="mr-1 inline size-4 fill-current" /> Listen · 2 min</button><span className="text-sm text-paper/50">A note by Amina Rahman</span></div></article><div className="rounded-[2rem] border border-terracotta/25 bg-sand/60 p-8"><LockKeyhole className="size-6 text-terracotta" /><p className="eyebrow mt-16">Letters & reminders</p><h2 className="mt-3 font-serif text-4xl">For what the daily note cannot hold.</h2><p className="mt-5 leading-7 text-muted-foreground">Longer, more intimate letters for paying attention to the hidden parts of a season.</p><a href="/consultation" className="mt-8 inline-flex rounded-full bg-ink px-5 py-3 text-sm text-white">Explore letters <ArrowUpRight className="ml-1 size-4" /></a></div></div></section></>}
     {type === 'series' && <><PageIntro eyebrow="Move at your own pace" title={<>Short series, <em>lasting questions.</em></>} description="A few free, thoughtful paths to return to whenever you need a little direction." /><section className="mx-auto max-w-7xl px-6 lg:px-10"><CardGrid items={categoryItems} kind="series" /></section></>}
