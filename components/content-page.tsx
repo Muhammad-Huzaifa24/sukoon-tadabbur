@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { ArrowUpRight, CalendarDays, Check, Clock3, LockKeyhole, Menu, Play, Sparkles, X } from 'lucide-react'
+import { SubscribeForm } from '@/components/subscribe-form'
 
 const navigation = [
   { label: 'Home', href: '/' },
@@ -44,7 +45,7 @@ function CardGrid({ items, kind }: { items: string[][]; kind: 'series' | 'course
   return <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">{items.map((item, index) => <article key={item[0]} className={`flex min-h-[300px] flex-col rounded-[1.75rem] border border-border p-7 ${index === 1 ? 'bg-olive text-paper' : 'bg-card'}`}><div className="flex items-center justify-between"><span className={`rounded-full px-3 py-1 text-xs ${index === 1 ? 'bg-paper/15 text-paper' : 'bg-olive/12 text-olive'}`}>{kind === 'series' ? item[3] : item[4]}</span>{kind === 'series' ? <span className="text-xs opacity-60">{item[2]}</span> : <Clock3 className="size-5 opacity-70" />}</div><h2 className="mt-auto font-serif text-3xl leading-tight">{item[0]}</h2><p className={`mt-4 text-sm leading-6 ${index === 1 ? 'text-paper/65' : 'text-muted-foreground'}`}>{item[1]}</p><div className={`mt-6 flex items-center justify-between border-t pt-4 text-sm ${index === 1 ? 'border-paper/20' : 'border-border'}`}><span>{kind === 'series' ? 'Start exploring' : `${item[2]} · ${item[3]}`}</span><ArrowUpRight className="size-4" /></div></article>)}</div>
 }
 
-function Footer() { return <footer className="mt-20 border-t border-border"><div className="mx-auto flex max-w-7xl flex-col gap-5 px-6 py-8 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between lg:px-10"><a href="/" className="font-serif text-xl text-ink">sukoon<span className="text-terracotta">.</span></a><p>For the life you are already living.</p><div className="flex flex-wrap gap-5"><a href="/blog">Blog</a><a href="mailto:hello@sukoon.example">Contact</a><a href="/">Privacy</a></div></div></footer> }
+function Footer() { return <footer className="mt-20 border-t border-border"><div className="mx-auto max-w-7xl px-6 py-10 lg:px-10"><div className="grid gap-8 rounded-[1.75rem] bg-sand p-7 md:grid-cols-[0.8fr_1.2fr] md:items-center"><div><p className="eyebrow">A note, now and then</p><p className="mt-3 font-serif text-3xl">Join the letters.</p></div><SubscribeForm /></div><div className="mt-8 flex flex-col gap-5 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between"><a href="/" className="font-serif text-xl text-ink">sukoon<span className="text-terracotta">.</span></a><p>For the life you are already living.</p><div className="flex flex-wrap gap-5"><a href="/blog">Blog</a><a href="/auth/sign-in">Sign in</a><a href="/admin">Admin</a><a href="mailto:hello@sukoon.example">Contact</a></div></div></div></footer> }
 
 export function ContentPage({ type }: { type: 'reminders' | 'series' | 'courses' | 'tadabbur' | 'consultation' | 'blog' }) {
   return <main><Header />
