@@ -117,7 +117,8 @@ export default function AdminPage() {
   async function save(event: FormEvent) {
     event.preventDefault()
     const body = editorRef.current?.innerHTML ?? form.body
-    const { error } = await createClient().from('site_content').upsert({ ...form, body, is_featured: false }, { onConflict: 'slug' })
+    const type = form.category.toLowerCase() === 'course' ? 'course' : form.category.toLowerCase()
+    const { error } = await createClient().from('site_content').upsert({ ...form, body, type, access: 'free', is_featured: false, publish_at: new Date().toISOString() }, { onConflict: 'slug' })
     setMessage(error ? 'Could not save. Check the Supabase table policies.' : 'Published to the site.')
     if (!error) {
       setForm(empty)
