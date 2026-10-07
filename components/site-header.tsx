@@ -41,12 +41,6 @@ export function SiteHeader() {
         </nav>
         <div className="hidden items-center gap-3 lg:flex">
           <a
-            href="/admin"
-            className="rounded-full px-4 py-2 text-sm text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            Admin
-          </a>
-          <a
             href="/reminders"
             className="rounded-full bg-ink px-5 py-2.5 text-sm text-white transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >

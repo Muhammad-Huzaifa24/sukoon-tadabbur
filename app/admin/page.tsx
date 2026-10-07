@@ -1,15 +1,8 @@
 "use client";
 
-import { FormEvent, useEffect, useRef, useState } from "react";
-import {
-  Bold,
-  Italic,
-  List,
-  ListOrdered,
-  LogOut,
-  Quote,
-  Underline,
-} from "lucide-react";
+import dynamic from "next/dynamic";
+import { FormEvent, useEffect, useState } from "react";
+import { Eye, EyeOff, LogOut } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import {
   Select,
@@ -19,6 +12,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+// Quill must be loaded client-side only (it accesses `document` on import)
+const RichTextEditor = dynamic(() => import("@/components/rich-text-editor"), {
+  ssr: false,
+  loading: () => (
+    <div className="min-h-64 animate-pulse rounded-xl border border-border bg-paper" />
+  ),
+});
+
 const categories = [
   "Reminder",
   "Series",
@@ -27,148 +28,36 @@ const categories = [
   "Consultation",
   "Blog",
 ] as const;
-const blockStyles = [
-  { value: "p", label: "Paragraph" },
-  { value: "h1", label: "Heading 1" },
-  { value: "h2", label: "Heading 2" },
-  { value: "h3", label: "Heading 3" },
-  { value: "h4", label: "Heading 4" },
-  { value: "h5", label: "Heading 5" },
-  { value: "h6", label: "Heading 6" },
-  { value: "blockquote", label: "Quote" },
-];
+
 const empty = {
   title: "",
-  slug: "",
   excerpt: "",
   body: "",
   category: "Reminder",
   status: "published",
 };
-type EditorCommand =
-  | "bold"
-  | "italic"
-  | "underline"
-  | "insertUnorderedList"
-  | "insertOrderedList"
-  | "formatBlock";
-
-const toolbarButtons: {
-  Icon: typeof Bold;
-  command: EditorCommand;
-  label: string;
-}[] = [
-  { Icon: Bold, command: "bold", label: "Bold" },
-  { Icon: Italic, command: "italic", label: "Italic" },
-  { Icon: Underline, command: "underline", label: "Underline" },
-  { Icon: List, command: "insertUnorderedList", label: "Bulleted list" },
-  { Icon: ListOrdered, command: "insertOrderedList", label: "Numbered list" },
-  { Icon: Quote, command: "formatBlock", label: "Quote" },
-];
 
 export default function AdminPage() {
-  const editorRef = useRef<HTMLDivElement>(null);
-  const selectionRef = useRef<Range | null>(null);
   const [loggedIn, setLoggedIn] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState(empty);
   const [message, setMessage] = useState("");
   const [count, setCount] = useState(0);
-  const [blockStyle, setBlockStyle] = useState("p");
-  const [active, setActive] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     fetch("/api/admin/session")
-      .then((response) => response.json())
-      .then((data) => setLoggedIn(data.authenticated === true));
+      .then((r) => r.json())
+      .then((d) => setLoggedIn(d.authenticated === true));
   }, []);
-
-  // Keep the toolbar highlight + block dropdown in sync with the caret/selection.
-  useEffect(() => {
-    document.addEventListener("selectionchange", syncToolbarState);
-    return () =>
-      document.removeEventListener("selectionchange", syncToolbarState);
-  }, []);
-
-  function syncToolbarState() {
-    const selection = window.getSelection();
-    if (
-      !selection ||
-      selection.rangeCount === 0 ||
-      !editorRef.current?.contains(selection.anchorNode)
-    )
-      return;
-    selectionRef.current = selection.getRangeAt(0).cloneRange();
-
-    const block = String(document.queryCommandValue("formatBlock"))
-      .toLowerCase()
-      .replace(/[<>]/g, "");
-    setActive({
-      bold: document.queryCommandState("bold"),
-      italic: document.queryCommandState("italic"),
-      underline: document.queryCommandState("underline"),
-      insertUnorderedList: document.queryCommandState("insertUnorderedList"),
-      insertOrderedList: document.queryCommandState("insertOrderedList"),
-      formatBlock: block === "blockquote",
-    });
-    setBlockStyle(
-      blockStyles.some((style) => style.value === block) ? block : "p",
-    );
-  }
 
   function updateField(field: keyof typeof empty, value: string) {
     setForm((current) => ({ ...current, [field]: value }));
   }
 
-  function saveSelection() {
-    const selection = window.getSelection();
-    if (
-      !selection ||
-      selection.rangeCount === 0 ||
-      !editorRef.current?.contains(selection.anchorNode)
-    )
-      return;
-    selectionRef.current = selection.getRangeAt(0).cloneRange();
-  }
-
-  function restoreSelection() {
-    const selection = window.getSelection();
-    const range = selectionRef.current;
-    if (!selection || !range) return;
-    selection.removeAllRanges();
-    selection.addRange(range);
-  }
-
-  function syncBody() {
-    setForm((current) => ({
-      ...current,
-      body: editorRef.current?.innerHTML ?? "",
-    }));
-  }
-
-  function format(command: EditorCommand, value?: string) {
-    const editor = editorRef.current;
-    if (!editor) return;
-
-    restoreSelection();
-    editor.focus({ preventScroll: true });
-    restoreSelection();
-    document.execCommand(command, false, value);
-    saveSelection();
-    syncBody();
-    syncToolbarState();
-  }
-
-  function handleBlockChange(value: string | null) {
-    if (!value) return;
-    setBlockStyle(value);
-    format("formatBlock", `<${value}>`);
-  }
-
   async function save(event: FormEvent) {
     event.preventDefault();
-    const body = editorRef.current?.innerHTML ?? form.body;
     const type =
       form.category.toLowerCase() === "course"
         ? "course"
@@ -178,23 +67,18 @@ export default function AdminPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         ...form,
-        body,
         type,
         access: "free",
         is_featured: false,
         publish_at: new Date().toISOString(),
       }),
     });
-    setMessage(
-      response.ok
-        ? "Published to the site."
-        : "Could not save. Check the admin credentials.",
-    );
     if (response.ok) {
+      setMessage("Published to the site.");
       setForm(empty);
-      setBlockStyle("p");
-      setActive({});
-      if (editorRef.current) editorRef.current.innerHTML = "";
+    } else {
+      const data = await response.json().catch(() => ({}));
+      setMessage(data.error ?? "Could not save. Check the admin credentials.");
     }
   }
 
@@ -205,6 +89,7 @@ export default function AdminPage() {
     setCount(subscriberCount ?? 0);
   }
 
+  // ── Login gate ──────────────────────────────────────────────────────────
   if (!loggedIn)
     return (
       <main className="min-h-screen bg-paper px-6 py-10">
@@ -212,9 +97,11 @@ export default function AdminPage() {
           <a href="/" className="cursor-pointer font-serif text-2xl">
             sukoon<span className="text-terracotta">.</span>
           </a>
-          <div className="mt-20 rounded-[2rem] border border-border bg-card p-8">
+          <div className="mt-20 rounded-4xl border border-border bg-card p-8">
             <p className="eyebrow">Private studio</p>
-            <h1 className="mt-3 font-serif text-4xl">Admin sign in.</h1>
+            <h1 className="mt-3 text-center font-serif text-2xl">
+              Admin sign in.
+            </h1>
             <form
               className="mt-8 flex flex-col gap-4"
               onSubmit={async (event) => {
@@ -233,18 +120,34 @@ export default function AdminPage() {
                 required
                 placeholder="Username"
                 value={username}
-                onChange={(event) => setUsername(event.target.value)}
+                onChange={(e) => setUsername(e.target.value)}
                 className="rounded-xl border border-border bg-paper px-4 py-3"
               />
-              <input
-                aria-label="Password"
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                className="rounded-xl border border-border bg-paper px-4 py-3"
-              />
-              {message && <p className="text-sm text-terracotta">{message}</p>}
+              <div className="relative">
+                <input
+                  aria-label="Password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full rounded-xl border border-border bg-paper px-4 py-3 pr-11"
+                />
+                <button
+                  type="button"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-ink"
+                >
+                  {showPassword ? (
+                    <EyeOff className="size-4" />
+                  ) : (
+                    <Eye className="size-4" />
+                  )}
+                </button>
+              </div>
+              {message && (
+                <p className="text-sm text-terracotta">{message}</p>
+              )}
               <button
                 type="submit"
                 className="cursor-pointer rounded-full bg-ink px-5 py-3 text-sm text-white"
@@ -257,6 +160,7 @@ export default function AdminPage() {
       </main>
     );
 
+  // ── Content studio ───────────────────────────────────────────────────────
   return (
     <main className="min-h-screen bg-paper px-6 py-10">
       <div className="mx-auto max-w-4xl">
@@ -266,52 +170,35 @@ export default function AdminPage() {
           </a>
           <button
             type="button"
-            className="cursor-pointer inline-flex items-center gap-2 text-sm underline"
+            className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-border px-4 py-2 text-base"
             onClick={async () => {
               await fetch("/api/admin/session", { method: "DELETE" });
               setLoggedIn(false);
             }}
           >
-            <LogOut />
+            <LogOut className="size-4" />
             Sign out
           </button>
         </div>
+
         <div className="mt-16">
           <p className="eyebrow">Content studio</p>
           <h1 className="mt-3 font-serif text-5xl">
             Write something worth returning to.
           </h1>
-          <p className="mt-4 max-w-xl text-muted-foreground">
-            Publish directly into Supabase. Use the toolbar to shape the body
-            copy.
-          </p>
-          <div className="mt-10 rounded-[2rem] border border-border bg-card p-8">
+
+          <div className="mt-10 rounded-4xl border border-border bg-card p-8">
             <form onSubmit={save} className="flex flex-col gap-4">
+              {/* Title */}
               <input
                 required
                 placeholder="Title"
                 value={form.title}
-                onChange={(event) => {
-                  const title = event.target.value;
-                  updateField("title", title);
-                  if (!form.slug)
-                    updateField(
-                      "slug",
-                      title
-                        .toLowerCase()
-                        .replace(/[^a-z0-9]+/g, "-")
-                        .replace(/(^-|-$)/g, ""),
-                    );
-                }}
+                onChange={(e) => updateField("title", e.target.value)}
                 className="rounded-xl border border-border bg-paper px-4 py-3"
               />
-              <input
-                required
-                placeholder="Slug"
-                value={form.slug}
-                onChange={(event) => updateField("slug", event.target.value)}
-                className="rounded-xl border border-border bg-paper px-4 py-3"
-              />
+
+              {/* Category */}
               <Select
                 value={form.category}
                 onValueChange={(value) => {
@@ -320,7 +207,7 @@ export default function AdminPage() {
               >
                 <SelectTrigger
                   aria-label="Category"
-                  className="h-14 min-h-14 w-full cursor-pointer rounded-xl border-border bg-paper px-5 text-base font-medium shadow-sm hover:border-terracotta focus-visible:border-terracotta"
+                  className="!h-[50px] min-h-[50px] w-full cursor-pointer rounded-xl border-border bg-paper px-5 text-base font-medium hover:border-terracotta focus-visible:border-terracotta"
                 >
                   <SelectValue placeholder="Choose a category" />
                 </SelectTrigger>
@@ -336,72 +223,27 @@ export default function AdminPage() {
                   ))}
                 </SelectContent>
               </Select>
+
+              {/* Excerpt */}
               <textarea
                 required
                 placeholder="Short excerpt"
                 value={form.excerpt}
-                onChange={(event) => updateField("excerpt", event.target.value)}
+                onChange={(e) => updateField("excerpt", e.target.value)}
                 className="min-h-16 resize-y rounded-xl border border-border bg-paper px-4 py-3"
               />
-              <div className="overflow-hidden rounded-xl border border-border bg-paper">
-                <div className="flex flex-wrap items-center gap-2 border-b border-border bg-card p-2">
-                  <Select value={blockStyle} onValueChange={handleBlockChange}>
-                    <SelectTrigger
-                      aria-label="Block style"
-                      className="h-10 w-36 cursor-pointer rounded-lg border-border bg-paper px-3 text-sm"
-                    >
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="rounded-xl border-border bg-card p-1 shadow-xl">
-                      {blockStyles.map((style) => (
-                        <SelectItem
-                          key={style.value}
-                          value={style.value}
-                          className="cursor-pointer rounded-lg px-3 py-2 text-sm focus:bg-terracotta/10 focus:text-ink"
-                        >
-                          {style.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {toolbarButtons.map(({ Icon, command, label }) => (
-                    <button
-                      key={command}
-                      type="button"
-                      aria-label={label}
-                      aria-pressed={!!active[command]}
-                      className={`cursor-pointer rounded-lg p-2 transition-colors ${active[command] ? "bg-terracotta/15 text-terracotta" : "text-ink hover:bg-terracotta/10"}`}
-                      onMouseDown={(event) => event.preventDefault()}
-                      onClick={() =>
-                        format(
-                          command,
-                          command === "formatBlock"
-                            ? active.formatBlock
-                              ? "<p>"
-                              : "<blockquote>"
-                            : undefined,
-                        )
-                      }
-                    >
-                      <Icon />
-                    </button>
-                  ))}
-                </div>
-                <div
-                  ref={editorRef}
-                  contentEditable
-                  role="textbox"
-                  aria-label="Body"
-                  data-placeholder="Write the body here..."
-                  onInput={syncBody}
-                  onBlur={saveSelection}
-                  className="editor-content min-h-64 px-4 py-3 outline-none"
-                />
-              </div>
-              <div className="flex items-center justify-between gap-4 pt-2">
+
+              {/* Rich text body */}
+              <RichTextEditor
+                value={form.body}
+                onChange={(value) => updateField("body", value)}
+              />
+
+              {/* Actions */}
+              <div className="flex sm:flex-row flex-col items-center justify-between gap-4 pt-2">
                 <button
                   type="submit"
-                  className="cursor-pointer rounded-full bg-ink px-6 py-3 text-sm text-white"
+                  className="cursor-pointer rounded-full bg-ink px-6 py-3 text-sm text-white sm:w-auto w-full"
                 >
                   Publish content
                 </button>
@@ -413,7 +255,10 @@ export default function AdminPage() {
                   Check subscribers ({count})
                 </button>
               </div>
-              {message && <p className="text-sm text-terracotta">{message}</p>}
+
+              {message && (
+                <p className="text-sm text-terracotta">{message}</p>
+              )}
             </form>
           </div>
         </div>

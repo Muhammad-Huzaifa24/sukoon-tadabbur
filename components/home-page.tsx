@@ -25,7 +25,7 @@ export async function HomePage() {
     supabase
       .from("published_content")
       .select(
-        "id,slug,title,excerpt,type,access,free_until,price_display,is_featured,event_starts_at,position,created_at",
+        "id,title,excerpt,type,access,free_until,price_display,is_featured,event_starts_at,position,created_at",
       )
       .order("position", { ascending: true })
       .limit(60),
@@ -150,7 +150,7 @@ export async function HomePage() {
             {featured.map((item) => (
               <a
                 key={item.id}
-                href={`/${item.type === "course" ? "courses" : item.type === "blog" ? "blog" : item.type}/${item.slug}`}
+                href={`/blog/${item.id}`}
                 className="rounded-[1.5rem] border border-paper/15 p-6"
               >
                 <Sparkles className="size-5 text-terracotta" />

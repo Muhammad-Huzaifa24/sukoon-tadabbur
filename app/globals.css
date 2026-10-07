@@ -178,3 +178,318 @@ h1 em {
     animation-duration: 0.01ms !important;
   }
 }
+
+/* ============================================================
+   Quill / Slack-style rich text editor  (.sukoon-quill)
+   Overrides quill.snow.css to match project design tokens.
+   ============================================================ */
+
+/* Wrapper — matches the existing rounded card style */
+.sukoon-quill {
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background: var(--paper);
+}
+
+/* ---- Toolbar ---- */
+.sukoon-quill .ql-toolbar.ql-snow {
+  border: none;
+  border-bottom: 1px solid var(--border);
+  background: var(--card);
+  padding: 6px 10px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px;
+}
+
+/* Button groups — add a subtle separator between them */
+.sukoon-quill .ql-toolbar.ql-snow .ql-formats {
+  margin-right: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.sukoon-quill .ql-toolbar.ql-snow .ql-formats:not(:last-child)::after {
+  content: "";
+  display: inline-block;
+  width: 1px;
+  height: 18px;
+  background: var(--border);
+  margin-left: 6px;
+  opacity: 0.8;
+}
+
+/* All toolbar buttons */
+.sukoon-quill .ql-toolbar.ql-snow button,
+.sukoon-quill .ql-toolbar.ql-snow .ql-picker-label {
+  width: 28px !important;
+  height: 28px !important;
+  min-height: 28px !important;
+  padding: 0;
+  border-radius: 6px;
+  color: var(--ink);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+  box-sizing: border-box;
+  line-height: 1;
+}
+
+.sukoon-quill .ql-toolbar.ql-snow button:hover,
+.sukoon-quill .ql-toolbar.ql-snow .ql-picker-label:hover {
+  background: color-mix(in oklch, var(--terracotta) 10%, transparent);
+  color: var(--terracotta);
+}
+
+/* Active / pressed state */
+.sukoon-quill .ql-toolbar.ql-snow button.ql-active,
+.sukoon-quill .ql-toolbar.ql-snow .ql-picker-label.ql-active,
+.sukoon-quill .ql-toolbar.ql-snow button.ql-active:hover {
+  background: color-mix(in oklch, var(--terracotta) 15%, transparent);
+  color: var(--terracotta);
+}
+
+/* SVG icons — inherit color */
+.sukoon-quill .ql-toolbar.ql-snow button svg,
+.sukoon-quill .ql-toolbar.ql-snow .ql-picker-label svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  fill: none;
+}
+
+/* Snow draws stroke/fill via .ql-stroke / .ql-fill classes — override them */
+.sukoon-quill .ql-toolbar .ql-stroke {
+  stroke: currentColor !important;
+  fill: none !important;
+}
+.sukoon-quill .ql-toolbar .ql-fill {
+  fill: currentColor !important;
+  stroke: none !important;
+}
+.sukoon-quill .ql-toolbar .ql-even {
+  fill: currentColor !important;
+}
+
+/* ---- Editor area ---- */
+.sukoon-quill .ql-container.ql-snow {
+  border: none;
+  font-family: var(--font-geist), sans-serif;
+  font-size: 0.95rem;
+  color: var(--ink);
+}
+
+.sukoon-quill .ql-editor {
+  min-height: 16rem;
+  padding: 0.75rem 1rem;
+  line-height: 1.7;
+  color: var(--ink);
+}
+
+/* Placeholder */
+.sukoon-quill .ql-editor.ql-blank::before {
+  color: var(--muted-foreground);
+  font-style: normal;
+  left: 1rem;
+  right: 1rem;
+}
+
+/* Focus ring on the wrapper */
+.sukoon-quill:focus-within {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* ---- Content formatting ---- */
+.sukoon-quill .ql-editor strong,
+.sukoon-quill .ql-editor b {
+  font-weight: 700;
+}
+
+.sukoon-quill .ql-editor em,
+.sukoon-quill .ql-editor i {
+  font-style: italic;
+}
+
+.sukoon-quill .ql-editor s {
+  text-decoration: line-through;
+}
+
+.sukoon-quill .ql-editor a {
+  color: var(--terracotta);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.sukoon-quill .ql-editor ol,
+.sukoon-quill .ql-editor ul {
+  padding-left: 1.5rem;
+}
+
+.sukoon-quill .ql-editor ul > li::before {
+  content: "•";
+  margin-right: 0.4em;
+}
+
+.sukoon-quill .ql-editor blockquote {
+  border-left: 3px solid var(--terracotta);
+  color: var(--muted-foreground);
+  font-family: var(--font-display), Georgia, serif;
+  font-style: italic;
+  margin: 0.75rem 0;
+  padding: 0.25rem 0 0.25rem 1rem;
+}
+
+.sukoon-quill .ql-editor pre.ql-syntax {
+  background: color-mix(in oklch, var(--ink) 6%, transparent);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  color: var(--ink);
+  font-family: ui-monospace, "Cascadia Code", "Fira Code", monospace;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  margin: 0.75rem 0;
+  padding: 0.75rem 1rem;
+  white-space: pre-wrap;
+}
+
+/* Indent levels */
+.sukoon-quill .ql-editor .ql-indent-1 { padding-left: 2em; }
+.sukoon-quill .ql-editor .ql-indent-2 { padding-left: 4em; }
+.sukoon-quill .ql-editor .ql-indent-3 { padding-left: 6em; }
+
+/* Snow tooltip (link edit popup) */
+.sukoon-quill .ql-snow .ql-tooltip {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 16px oklch(0.23 0.025 75 / 12%);
+  color: var(--ink);
+  font-family: var(--font-geist), sans-serif;
+  font-size: 0.875rem;
+}
+
+.sukoon-quill .ql-snow .ql-tooltip input[type="text"] {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 0.375rem;
+  color: var(--ink);
+  outline: none;
+  padding: 4px 8px;
+}
+
+.sukoon-quill .ql-snow .ql-tooltip input[type="text"]:focus {
+  border-color: var(--ring);
+}
+
+.sukoon-quill .ql-snow .ql-tooltip a.ql-action,
+.sukoon-quill .ql-snow .ql-tooltip a.ql-remove {
+  color: var(--terracotta);
+}
+
+/* ============================================================
+   .prose-sukoon
+   Render styles for Quill HTML on public pages (blog/[id]).
+   Mirrors .sukoon-quill .ql-editor so editor output = page output.
+   ============================================================ */
+
+.prose-sukoon {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--ink);
+}
+
+.prose-sukoon p {
+  margin: 0.6rem 0;
+}
+
+/* Inline formatting */
+.prose-sukoon strong,
+.prose-sukoon b {
+  font-weight: 700;
+}
+
+.prose-sukoon em,
+.prose-sukoon i {
+  font-style: italic;
+}
+
+.prose-sukoon u {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.prose-sukoon s {
+  text-decoration: line-through;
+}
+
+/* Links */
+.prose-sukoon a {
+  color: var(--terracotta);
+  text-underline-offset: 3px;
+  background-color: #ffe4d9;
+  padding: 0px 2px;
+  border-radius: 3px;
+}
+
+.prose-sukoon a:hover{
+  text-decoration: underline;
+}
+
+/* Blockquote */
+.prose-sukoon blockquote {
+  border-left: 3px solid var(--terracotta);
+  color: var(--muted-foreground);
+  font-family: var(--font-display), Georgia, serif;
+  font-style: italic;
+  margin: 0.75rem 0;
+  padding: 0.25rem 0 0.25rem 1rem;
+  border-radius: 3px;
+}
+
+/* Code block — Quill outputs <pre class="ql-syntax"> */
+.prose-sukoon pre,
+.prose-sukoon pre.ql-syntax {
+  background: color-mix(in oklch, var(--ink) 6%, transparent);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  color: var(--ink);
+  font-family: ui-monospace, "Cascadia Code", "Fira Code", monospace;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  margin: 0.75rem 0;
+  padding: 0.75rem 1rem;
+  white-space: pre-wrap;
+  overflow-x: auto;
+}
+
+/* Lists */
+.prose-sukoon ol,
+.prose-sukoon ul {
+  padding-left: 1.5rem;
+  margin: 0.5rem 0;
+}
+
+.prose-sukoon ol {
+  list-style: decimal;
+}
+
+.prose-sukoon ul {
+  list-style: disc;
+}
+
+.prose-sukoon li {
+  padding-left: 0.25rem;
+  margin: 0.2rem 0;
+}
+
+/* Quill indent levels (.ql-indent-N classes on <li>) */
+.prose-sukoon .ql-indent-1 { padding-left: 2em; }
+.prose-sukoon .ql-indent-2 { padding-left: 4em; }
+.prose-sukoon .ql-indent-3 { padding-left: 6em; }
+.prose-sukoon .ql-indent-4 { padding-left: 8em; }
+.prose-sukoon .ql-indent-5 { padding-left: 10em; }

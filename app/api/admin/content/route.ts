@@ -13,8 +13,8 @@ export async function POST(request: Request) {
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
   );
   const { error } = await client
-    .from("site_content")
-    .upsert(payload, { onConflict: "slug" });
+    .from("published_content")
+    .upsert(payload, { onConflict: "id" });
   return error
     ? NextResponse.json({ error: error.message }, { status: 400 })
     : NextResponse.json({ ok: true });

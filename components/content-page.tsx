@@ -32,7 +32,6 @@ type ContentItem = {
   excerpt: string;
   body: string;
   category: string;
-  slug: string;
   type?: string;
   access?: string;
   price_display?: string | null;
@@ -74,7 +73,7 @@ function CardGrid({
     <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
       {items.map((item, index) => (
         <a
-          href={`/blog/${item.slug}`}
+          href={`/blog/${item.id}`}
           key={item.id}
           className={`flex min-h-[300px] flex-col rounded-[1.75rem] border border-border p-7 ${index === 1 ? "bg-olive text-paper" : "bg-card"}`}
         >
@@ -123,7 +122,7 @@ export async function ContentPage({
   const { data } = await client
     .from("published_content")
     .select(
-      "id,title,excerpt,body,category,slug,type,access,price_display,event_starts_at",
+      "id,title,excerpt,body,category,type,access,price_display,event_starts_at",
     )
     .in("type", contentTypes)
     .order("position", { ascending: true });
@@ -147,7 +146,7 @@ export async function ContentPage({
               {categoryItems.map((item, index) => (
                 <a
                   key={item.id}
-                  href={`/blog/${item.slug}`}
+                  href={`/blog/${item.id}`}
                   className={`flex min-h-[260px] flex-col justify-between rounded-[2rem] p-8 ${index === 0 ? "bg-ink text-paper" : "border border-border bg-card"}`}
                 >
                   <div>
@@ -247,7 +246,7 @@ export async function ContentPage({
                     {item.excerpt}
                   </p>
                   <a
-                    href={`/blog/${item.slug}`}
+                    href={`/blog/${item.id}`}
                     className="mt-8 inline-flex text-sm"
                   >
                     View details <ArrowUpRight className="ml-2 size-4" />
@@ -325,7 +324,7 @@ export async function ContentPage({
               {categoryItems.map((item, index) => (
                 <a
                   key={item.id}
-                  href={`/blog/${item.slug}`}
+                  href={`/blog/${item.id}`}
                   className={`rounded-[1.5rem] p-7 ${index === 0 ? "bg-sand md:col-span-2 md:p-12" : "border border-border"}`}
                 >
                   <p className="eyebrow">

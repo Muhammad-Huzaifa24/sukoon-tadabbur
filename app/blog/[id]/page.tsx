@@ -5,18 +5,17 @@ import { createClient } from "@/lib/supabase/server";
 
 export const revalidate = 60;
 
-export default async function BlogPost({
+export default async function ContentPost({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ id: string }>;
 }) {
-  const { slug } = await params;
+  const { id } = await params;
   const supabase = await createClient();
   const { data: post } = await supabase
     .from("published_content")
-    .select("title,excerpt,body,created_at")
-    .eq("slug", slug)
-    .eq("type", "blog")
+    .select("title,excerpt,body,created_at,type")
+    .eq("id", id)
     .maybeSingle();
   if (!post) notFound();
   return (

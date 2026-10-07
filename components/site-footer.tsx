@@ -18,7 +18,6 @@ export function SiteFooter() {
           <p>For the life you are already living.</p>
           <div className="flex flex-wrap gap-5">
             <a href="/blog">Blog</a>
-            <a href="/admin">Admin</a>
             <a href="mailto:hello@sukoon.example">Contact</a>
             <a href="/privacy">Privacy</a>
           </div>
