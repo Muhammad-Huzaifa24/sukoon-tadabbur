@@ -1,6 +1,7 @@
 import { Analytics } from "@vercel/analytics/next";
 import type { Metadata, Viewport } from "next";
 import { Amiri, Fraunces, Inter } from "next/font/google";
+import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -42,6 +43,7 @@ export default function RootLayout({
         className={`${fraunces.variable} ${inter.variable} ${amiri.variable} antialiased`}
       >
         {children}
+        <Toaster richColors position="top-center" />
         {process.env.NODE_ENV === "production" && <Analytics />}
       </body>
     </html>
