@@ -150,7 +150,7 @@ export default function AdminPage() {
               )}
               <button
                 type="submit"
-                className="cursor-pointer rounded-full bg-ink px-5 py-3 text-sm text-white"
+                className="btn btn-primary"
               >
                 Enter studio
               </button>
@@ -170,7 +170,7 @@ export default function AdminPage() {
           </a>
           <button
             type="button"
-            className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-border px-4 py-2 text-base"
+            className="btn inline-flex cursor-pointer items-center gap-2 rounded-xl border border-border px-4 py-2 text-base"
             onClick={async () => {
               await fetch("/api/admin/session", { method: "DELETE" });
               setLoggedIn(false);
@@ -243,14 +243,14 @@ export default function AdminPage() {
               <div className="flex sm:flex-row flex-col items-center justify-between gap-4 pt-2">
                 <button
                   type="submit"
-                  className="cursor-pointer rounded-full bg-ink px-6 py-3 text-sm text-white sm:w-auto w-full"
+                  className="btn btn-primary"
                 >
                   Publish content
                 </button>
                 <button
                   type="button"
                   onClick={loadCount}
-                  className="cursor-pointer text-sm underline"
+                  className="btn btn-ghost"
                 >
                   Check subscribers ({count})
                 </button>

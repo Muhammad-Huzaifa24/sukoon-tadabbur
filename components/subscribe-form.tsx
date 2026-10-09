@@ -14,12 +14,10 @@ export function SubscribeForm() {
   async function submit(event: FormEvent) {
     event.preventDefault();
     const normalised = email.trim().toLowerCase();
-
     if (!isValidEmail(normalised)) {
       toast.error("Please enter a valid email address.");
       return;
     }
-
     setBusy(true);
     try {
       const res = await fetch("/api/subscribe", {
@@ -28,20 +26,9 @@ export function SubscribeForm() {
         body: JSON.stringify({ email: normalised, website: "" }),
       });
       const data = await res.json();
-
-      if (res.status === 429) {
-        toast.error("Too many attempts. Please wait a moment.");
-        return;
-      }
-      if (!res.ok) {
-        toast.error(data.error ?? "Something went wrong. Please try again.");
-        return;
-      }
-      if (data.status === "already_subscribed") {
-        toast.info("You're already subscribed.");
-        return;
-      }
-
+      if (res.status === 429) { toast.error("Too many attempts. Please wait a moment."); return; }
+      if (!res.ok)            { toast.error(data.error ?? "Something went wrong. Please try again."); return; }
+      if (data.status === "already_subscribed") { toast.info("You're already subscribed."); return; }
       setEmail("");
       toast.success("You're on the list. Welcome.");
     } catch {
@@ -52,34 +39,67 @@ export function SubscribeForm() {
   }
 
   return (
-    <form onSubmit={submit} className="flex flex-col gap-3 sm:flex-row">
-      {/* Honeypot — visually hidden, bots fill it, real users don't */}
-      <input
-        type="text"
-        name="website"
-        aria-hidden="true"
-        tabIndex={-1}
-        autoComplete="off"
-        style={{ display: "none" }}
-      />
-      <label className="sr-only" htmlFor="subscriber-email">
-        Email address
-      </label>
-      <input
-        id="subscriber-email"
-        required
-        type="email"
-        placeholder="Your email address"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        className="min-w-0 flex-1 rounded-full border border-border bg-paper px-5 py-3 text-sm outline-none"
-      />
-      <button
-        disabled={busy}
-        className="rounded-full bg-ink px-5 py-3 text-sm text-white disabled:cursor-wait disabled:opacity-60"
-      >
-        {busy ? "Joining…" : "Join the letters"}
-      </button>
-    </form>
+    <>
+      <form onSubmit={submit} className="subscribe-pill">
+        {/* Honeypot */}
+        <input type="text" name="website" aria-hidden="true" tabIndex={-1} autoComplete="off" style={{ display: "none" }} />
+        <label htmlFor="subscriber-email" style={{ position: "absolute", left: -9999 }}>Email address</label>
+        <input
+          id="subscriber-email"
+          required
+          type="email"
+          placeholder="Email address"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="subscribe-pill__input"
+        />
+        <button type="submit" disabled={busy} className="btn btn-primary subscribe-pill__btn">
+          {busy ? "Joining…" : "Join the letters"}
+        </button>
+      </form>
+
+      <style>{`
+        .subscribe-pill {
+          display: flex;
+          gap: 10px;
+          padding: 8px;
+          border: 1px solid var(--line);
+          border-radius: 999px;
+          background: var(--paper-2);
+          position: relative;
+        }
+        .subscribe-pill__input {
+          flex: 1;
+          min-width: 0;
+          border: 2px solid transparent;
+          border-radius: 999px;
+          background: transparent;
+          padding: 10px 18px;
+          font-family: var(--font-geist), sans-serif;
+          font-size: 18px;
+          color: var(--ink);
+          outline: none !important;
+          transition: border-color .3s;
+        }
+        .subscribe-pill__input::placeholder {
+          color: var(--ink-soft);
+        }
+        .subscribe-pill__input:focus {
+          border-color: var(--gold);
+        }
+        .subscribe-pill__btn {
+          padding: 12px 22px !important;
+          font-size: 14px !important;
+          flex-shrink: 0;
+        }
+        .subscribe-pill__btn:disabled {
+          cursor: wait;
+          opacity: .6;
+        }
+        @media (max-width: 600px) {
+          .subscribe-pill__input { font-size: 12px; }
+        }
+      `}</style>
+    </>
   );
 }
